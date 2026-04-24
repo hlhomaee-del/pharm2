@@ -1,0 +1,869 @@
+html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PharmMaster — NHA CCMA Pharmacology Trainer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f8f9fc;--surface:#fff;--glass:rgba(255,255,255,0.72);
+  --text:#1a1a2e;--text2:#555;--text3:#888;
+  --pri:#2563eb;--pri2:#1d4ed8;--pri-light:#dbeafe;
+  --green:#10b981;--green-light:#d1fae5;
+  --red:#ef4444;--red-light:#fee2e2;
+  --orange:#f59e0b;--orange-light:#fef3c7;
+  --purple:#8b5cf6;--purple-light:#ede9fe;
+  --teal:#14b8a6;--teal-light:#ccfbf1;
+  --pink:#ec4899;--pink-light:#fce7f3;
+  --shadow:0 4px 24px rgba(0,0,0,0.06);
+  --shadow2:0 8px 40px rgba(0,0,0,0.1);
+  --radius:16px;--radius-sm:10px;
+  --font:'DM Sans',sans-serif;
+  --font-display:'Outfit',sans-serif;
+  --font-mono:'Space Mono',monospace;
+  --nav-h:64px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+button{font-family:inherit;cursor:pointer;border:none;outline:none}
+input,select{font-family:inherit}
+
+.top-nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(0,0,0,0.06);z-index:100;display:flex;align-items:center;padding:0 20px;gap:12px}
+.logo{font-family:var(--font-display);font-weight:800;font-size:22px;background:linear-gradient(135deg,var(--pri),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.logo span{font-weight:400;font-size:14px;-webkit-text-fill-color:var(--text3);margin-left:4px}
+.nav-score{margin-left:auto;display:flex;align-items:center;gap:16px;font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap}
+.nav-score .sv{color:var(--pri);font-family:var(--font-mono);font-size:15px}
+.nav-score .streak{color:var(--orange)}
+
+.tab-bar{position:fixed;top:var(--nav-h);left:0;right:0;background:var(--surface);border-bottom:1px solid rgba(0,0,0,0.06);z-index:99;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tab-bar::-webkit-scrollbar{display:none}
+.tab-bar-inner{display:inline-flex;gap:2px;padding:6px 12px}
+.tab-btn{padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;color:var(--text3);background:none;transition:all .2s;flex-shrink:0}
+.tab-btn:hover{background:var(--pri-light);color:var(--pri)}
+.tab-btn.active{background:var(--pri);color:#fff}
+
+.main{margin-top:calc(var(--nav-h) + 52px);padding:20px;max-width:1100px;margin-left:auto;margin-right:auto}
+.module{display:none;animation:fadeUp .4s ease}
+.module.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+
+.card{background:var(--surface);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:20px;border:1px solid rgba(0,0,0,0.04)}
+.card h3{font-family:var(--font-display);font-weight:700;font-size:20px;margin-bottom:6px;line-height:1.3}
+.card .sub{color:var(--text2);font-size:14px;margin-bottom:16px;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.badge-g{background:var(--green-light);color:var(--green)}
+.badge-r{background:var(--red-light);color:var(--red)}
+.badge-b{background:var(--pri-light);color:var(--pri)}
+.badge-p{background:var(--purple-light);color:var(--purple)}
+.badge-o{background:var(--orange-light);color:var(--orange)}
+
+.progress-wrap{width:100%;height:8px;background:#e5e7eb;border-radius:8px;overflow:hidden;margin:10px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pri),var(--purple));border-radius:8px;transition:width .5s ease}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:12px 24px;border-radius:var(--radius-sm);font-weight:600;font-size:14px;transition:all .2s}
+.btn-p{background:var(--pri);color:#fff}.btn-p:hover{background:var(--pri2);transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,.3)}
+.btn-o{background:none;border:2px solid var(--pri);color:var(--pri)}.btn-o:hover{background:var(--pri-light)}
+.btn-g{background:var(--green);color:#fff}
+.btn-s{padding:8px 16px;font-size:13px;border-radius:8px}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none!important}
+
+.opts{display:flex;flex-direction:column;gap:10px;margin:16px 0}
+.opt{padding:14px 18px;border:2px solid #e5e7eb;border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;font-size:14px;line-height:1.5;text-align:left;background:var(--surface)}
+.opt:hover:not(.done){border-color:var(--pri);background:var(--pri-light)}
+.opt.correct{border-color:var(--green);background:var(--green-light);color:#065f46}
+.opt.wrong{border-color:var(--red);background:var(--red-light);color:#991b1b}
+.opt.show-right{border-color:var(--green);background:var(--green-light)}
+.opt.done{cursor:default;opacity:.9}
+.rat{margin-top:14px;padding:14px 18px;border-radius:var(--radius-sm);font-size:13px;line-height:1.6;animation:fadeUp .3s ease}
+.rat-g{background:var(--green-light);border-left:4px solid var(--green)}
+.rat-r{background:var(--red-light);border-left:4px solid var(--red)}
+
+.click-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin:16px 0}
+.cc{background:var(--surface);border:2px solid #e5e7eb;border-radius:var(--radius);padding:20px;text-align:center;cursor:pointer;transition:all .3s}
+.cc:hover{transform:translateY(-3px);box-shadow:var(--shadow2);border-color:var(--pri)}
+.cc .ic{font-size:36px;margin-bottom:10px}
+.cc .tt{font-weight:700;font-size:14px;margin-bottom:4px}
+.cc .det{font-size:12px;color:var(--text2);display:none;margin-top:10px;line-height:1.5;text-align:left}
+.cc.open .det{display:block}
+.cc.open{border-color:var(--teal);background:var(--teal-light)}
+
+.timer-bar{display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:18px;font-weight:700;color:var(--red);margin-bottom:16px}
+.timer-track{flex:1;height:6px;background:#e5e7eb;border-radius:6px;overflow:hidden}
+.timer-fill{height:100%;background:linear-gradient(90deg,var(--red),var(--orange));transition:width .3s linear;border-radius:6px}
+
+.sim-soap{background:linear-gradient(135deg,#f0f9ff,#ede9fe);border-radius:var(--radius);padding:24px;margin:16px 0;border:1px solid rgba(0,0,0,0.06)}
+.sim-soap h4{font-family:var(--font-display);margin-bottom:10px;color:var(--pri2)}
+.sim-soap p{font-size:14px;line-height:1.6;color:var(--text2);margin-bottom:6px}
+
+.calc-box{background:linear-gradient(135deg,#fef3c7,#fff7ed);border-radius:var(--radius);padding:24px;margin:16px 0;font-size:15px;line-height:1.7;border:1px solid rgba(0,0,0,0.04)}
+.calc-row{display:flex;gap:10px;align-items:center;margin:14px 0;flex-wrap:wrap}
+.calc-row input{padding:10px 14px;border:2px solid #e5e7eb;border-radius:8px;font-size:16px;font-family:var(--font-mono);width:120px}
+.calc-row input:focus{border-color:var(--pri);outline:none}
+
+.chip-pool{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;justify-content:center}
+.chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;cursor:grab;user-select:none;transition:all .2s}
+.chip.used{opacity:.3;cursor:default;pointer-events:none}
+.drop-zones{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:16px 0}
+.dz{border:2px dashed #d1d5db;border-radius:var(--radius-sm);padding:14px;min-height:90px;text-align:center;transition:all .2s}
+.dz .dz-t{font-weight:700;font-size:13px;margin-bottom:8px;color:var(--text2)}
+.dz.over{border-color:var(--pri);background:var(--pri-light)}
+.dz .dz-items{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+
+.pair-row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.pair-row>div{flex:1;min-width:200px;padding:14px;border-radius:var(--radius-sm)}
+
+.big-score{font-family:var(--font-display);font-size:64px;font-weight:900;background:linear-gradient(135deg,var(--pri),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin:12px 0}
+
+.welcome-hero{text-align:center;padding:60px 20px 40px}
+.welcome-hero h1{font-family:var(--font-display);font-weight:900;font-size:clamp(32px,5vw,48px);line-height:1.1;margin-bottom:16px}
+.welcome-hero h1 .g{background:linear-gradient(135deg,var(--pri),var(--purple),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.welcome-hero p{font-size:16px;color:var(--text2);max-width:560px;margin:0 auto 28px;line-height:1.6}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:28px}
+.mc{background:var(--surface);border:1px solid rgba(0,0,0,0.06);border-radius:var(--radius);padding:20px;cursor:pointer;transition:all .25s;text-align:left}
+.mc:hover{transform:translateY(-4px);box-shadow:var(--shadow2);border-color:var(--pri)}
+.mc .mci{font-size:28px;margin-bottom:10px}
+.mc .mct{font-weight:700;font-size:14px;margin-bottom:4px}
+.mc .mcd{font-size:12px;color:var(--text3);line-height:1.4}
+
+.mi{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.mi .mi-ic{width:56px;height:56px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+.mi h2{font-family:var(--font-display);font-weight:800;font-size:24px;margin-bottom:4px}
+.mi p{font-size:13px;color:var(--text2)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);padding:12px 24px;border-radius:var(--radius-sm);font-weight:600;font-size:14px;z-index:200;transition:transform .3s ease;box-shadow:var(--shadow2)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast-s{background:var(--green);color:#fff}
+.toast-e{background:var(--red);color:#fff}
+.toast-i{background:var(--pri);color:#fff}
+
+.act-btns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.qc{font-size:13px;color:var(--text3);font-weight:600;margin-bottom:8px}
+
+@media(max-width:768px){
+  .main{padding:14px}.card{padding:20px}
+  .drop-zones{grid-template-columns:1fr 1fr}
+  .click-grid{grid-template-columns:1fr 1fr}
+  .logo span{display:none}
+  .tab-btn{padding:7px 10px;font-size:11px}
+}
+@media(max-width:480px){.click-grid{grid-template-columns:1fr}.drop-zones{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="logo">PharmMaster<span>NHA CCMA</span></div>
+  <div class="nav-score">
+    <span>Score: <span class="sv" id="navS">0</span></span>
+    <span class="streak">🔥 <span id="navK">0</span></span>
+  </div>
+</nav>
+
+<div class="tab-bar"><div class="tab-bar-inner">
+  <button class="tab-btn active" data-t="home">🏠 Home</button>
+  <button class="tab-btn" data-t="m1">💊 Drug Classes</button>
+  <button class="tab-btn" data-t="m2">🔒 Schedules</button>
+  <button class="tab-btn" data-t="m3">⚠️ Reactions</button>
+  <button class="tab-btn" data-t="m4">🧮 Dosage</button>
+  <button class="tab-btn" data-t="m5">💉 Med Forms</button>
+  <button class="tab-btn" data-t="m6">👀 Look-Alike</button>
+  <button class="tab-btn" data-t="m7">🛤️ Routes</button>
+  <button class="tab-btn" data-t="m8">🔬 ADME</button>
+  <button class="tab-btn" data-t="m9">✅ Rights</button>
+  <button class="tab-btn" data-t="m10">🗄️ Storage</button>
+  <button class="tab-btn" data-t="m11">📚 Drug Info</button>
+  <button class="tab-btn" data-t="sim">🏥 Simulation</button>
+  <button class="tab-btn" data-t="perf">📊 Stats</button>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<div class="main">
+  <div class="module active" id="home"></div>
+  <div class="module" id="m1"></div>
+  <div class="module" id="m2"></div>
+  <div class="module" id="m3"></div>
+  <div class="module" id="m4"></div>
+  <div class="module" id="m5"></div>
+  <div class="module" id="m6"></div>
+  <div class="module" id="m7"></div>
+  <div class="module" id="m8"></div>
+  <div class="module" id="m9"></div>
+  <div class="module" id="m10"></div>
+  <div class="module" id="m11"></div>
+  <div class="module" id="sim"></div>
+  <div class="module" id="perf"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// GLOBAL
+// ═══════════════════════════════════════════
+const A={score:0,streak:0,best:0,att:{},cor:{}};
+const MN={m1:'Drug Classifications',m2:'Controlled Substances',m3:'Side Effects & Reactions',m4:'Dosage & Measurements',m5:'Medication Forms',m6:'Look-Alike Drugs',m7:'Routes of Administration',m8:'Pharmacokinetics (ADME)',m9:'Rights of Administration',m10:'Storage & Disposal',m11:'Drug Info & FDA',sim:'Clinical Simulation'};
+const MI={m1:'💊',m2:'🔒',m3:'⚠️',m4:'🧮',m5:'💉',m6:'👀',m7:'🛤️',m8:'🔬',m9:'✅',m10:'🗄️',m11:'📚',sim:'🏥'};
+
+// Audio
+const AC=window.AudioContext||window.webkitAudioContext;let ac;
+function ea(){if(!ac)ac=new AC()}
+function sndOk(){ea();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type='sine';o.frequency.setValueAtTime(523,ac.currentTime);o.frequency.setValueAtTime(659,ac.currentTime+.1);o.frequency.setValueAtTime(784,ac.currentTime+.2);g.gain.setValueAtTime(.12,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.4);o.start();o.stop(ac.currentTime+.4)}
+function sndNo(){ea();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.type='square';o.frequency.setValueAtTime(200,ac.currentTime);o.frequency.setValueAtTime(150,ac.currentTime+.15);g.gain.setValueAtTime(.08,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+.3);o.start();o.stop(ac.currentTime+.3)}
+
+// Utils
+function sh(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b}
+function toast(m,t='s'){const e=document.getElementById('toast');e.textContent=m;e.className='toast toast-'+t+' show';setTimeout(()=>e.classList.remove('show'),2200)}
+function upNav(){document.getElementById('navS').textContent=A.score;document.getElementById('navK').textContent=A.streak}
+function addPts(p,m){A.score+=p;upNav()}
+function track(m,ok){if(!A.att[m])A.att[m]=0;if(!A.cor[m])A.cor[m]=0;A.att[m]++;if(ok){A.cor[m]++;A.streak++;if(A.streak>A.best)A.best=A.streak}else A.streak=0;upNav()}
+
+// Tab switch — always re-render
+function sw(id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.t===id));
+  document.querySelectorAll('.module').forEach(m=>m.classList.toggle('active',m.id===id));
+  if(id==='home')renderHome();
+  else if(id==='perf')renderPerf();
+  else loadMod(id);
+  window.scrollTo({top:0});
+}
+document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>sw(b.dataset.t)));
+
+// ═══════════════════════════════════════════
+// MCQ ENGINE (reusable)
+// ═══════════════════════════════════════════
+function runQuiz(el,qs,modId,onDone){
+  const list=sh(qs);let idx=0;
+  function go(){
+    if(idx>=list.length){if(onDone)onDone(el);return}
+    const q=list[idx];
+    const oi=sh(q.o.map((_,i)=>i));
+    const ci=oi.indexOf(q.c);
+    el.innerHTML=`<div class="qc">Question ${idx+1} of ${list.length}</div>
+      <div class="progress-wrap"><div class="progress-fill" style="width:${idx/list.length*100}%"></div></div>
+      <div class="card fade-in"><h3 style="font-size:16px;line-height:1.5">${q.q}</h3>
+      <div class="opts" id="_qo"></div><div id="_qr"></div>
+      <div style="margin-top:14px;display:none" id="_qn"><button class="btn btn-p btn-s" id="_qnb">${idx<list.length-1?'Next Question →':'Finish'}</button></div></div>`;
+    const oel=document.getElementById('_qo');
+    oi.forEach((orig,i)=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=q.o[orig];
+      b.onclick=()=>{
+        oel.querySelectorAll('.opt').forEach((x,xi)=>{x.classList.add('done');if(xi===ci)x.classList.add('correct');if(xi===i&&i!==ci)x.classList.add('wrong')});
+        const ok=i===ci;
+        if(ok){sndOk();addPts(10,modId);toast('✓ Correct! +10')}else{sndNo();toast('✗ Incorrect','e')}
+        track(modId,ok);
+        document.getElementById('_qr').innerHTML=`<div class="rat ${ok?'rat-g':'rat-r'}"><strong>${ok?'✓ Correct':'✗ Incorrect'}</strong><br>${q.r[q.c]}</div>`;
+        document.getElementById('_qn').style.display='block';
+      };
+      oel.appendChild(b);
+    });
+    document.getElementById('_qnb').onclick=()=>{idx++;go()};
+  }
+  go();
+}
+function doneMsgHTML(modId){
+  return `<div class="card" style="text-align:center;padding:40px"><h3>🎉 Section Complete!</h3><p class="sub">Great work! Try again for a higher score.</p><button class="btn btn-p btn-s" onclick="sw('${modId}')">🔄 Restart Module</button> <button class="btn btn-o btn-s" onclick="sw('perf')">📊 See Stats</button></div>`;
+}
+
+// ═══════════════════════════════════════════
+// DATA — ALL MODULES FULLY LOADED
+// ═══════════════════════════════════════════
+const D={
+
+// ══ MODULE 1: Drug Classifications ══
+m1q:[
+{q:'A patient with hypertension is prescribed a medication ending in "-pril." What drug class does this belong to?',o:['ACE Inhibitor','Beta Blocker','Calcium Channel Blocker','ARB'],c:0,r:['Correct! "-pril" drugs (lisinopril, enalapril) are ACE inhibitors for blood pressure.','Beta blockers end in "-olol" (metoprolol).','CCBs end in "-dipine" (amlodipine).','ARBs end in "-sartan" (losartan).']},
+{q:'Which drug class is the FIRST-LINE treatment for Type 2 diabetes?',o:['Sulfonylureas','Biguanides (Metformin)','Insulin','Thiazolidinediones'],c:1,r:['Sulfonylureas are used but NOT first-line.','Correct! Metformin is first-line for Type 2 diabetes.','Insulin is for Type 1 or advanced Type 2.','Thiazolidinediones are add-on therapy.']},
+{q:'A drug ending in "-statin" belongs to which class?',o:['Antihypertensive','Antilipemic (Statin)','Antibiotic','Antidiabetic'],c:1,r:['Antihypertensives have various suffixes.','Correct! Statins (atorvastatin, simvastatin) lower cholesterol.','Antibiotics have suffixes like -cillin, -mycin.','Antidiabetics have varied names.']},
+{q:'Warfarin is prescribed primarily to:',o:['Lower cholesterol','Prevent blood clots','Reduce inflammation','Lower blood sugar'],c:1,r:['Statins lower cholesterol.','Correct! Warfarin is an anticoagulant preventing clot formation.','NSAIDs reduce inflammation.','Antidiabetics lower blood sugar.']},
+{q:'SSRIs like sertraline belong to which classification?',o:['Antianxiety','Antidepressant','Antipsychotic','Mood stabilizer'],c:1,r:['Benzodiazepines are antianxiety.','Correct! SSRIs (sertraline, fluoxetine) are antidepressants.','Antipsychotics include haloperidol.','Lithium is a mood stabilizer.']},
+{q:'A drug ending in "-olol" most likely belongs to which class?',o:['ACE Inhibitor','Beta Blocker','Antibiotic','Diuretic'],c:1,r:['ACE inhibitors end in "-pril."','Correct! "-olol" drugs (metoprolol, atenolol, propranolol) are beta blockers.','Antibiotics have suffixes like -mycin, -cillin.','Diuretics include hydrochlorothiazide.']},
+{q:'Omeprazole belongs to which drug class?',o:['Beta Blocker','Proton Pump Inhibitor','SSRI','ACE Inhibitor'],c:1,r:['Beta blockers end in "-olol."','Correct! Omeprazole is a PPI that reduces stomach acid production.','SSRIs are antidepressants.','ACE inhibitors end in "-pril."']},
+{q:'Which suffix indicates a benzodiazepine?',o:['-pam or -lam','-statin','-pril','-olol'],c:0,r:['Correct! Benzodiazepines end in "-pam" (diazepam) or "-lam" (alprazolam).','Statins lower cholesterol.','-pril = ACE inhibitor.','-olol = beta blocker.']},
+{q:'Prednisone belongs to which drug class?',o:['NSAID','Corticosteroid','Antibiotic','Opioid'],c:1,r:['NSAIDs include ibuprofen, naproxen.','Correct! Prednisone is a corticosteroid used to reduce inflammation and suppress the immune system.','Antibiotics fight infections.','Opioids are pain medications.']},
+{q:'A patient is prescribed hydrochlorothiazide (HCTZ). This is a:',o:['Beta Blocker','Calcium Channel Blocker','Thiazide Diuretic','ACE Inhibitor'],c:2,r:['Beta blockers end in "-olol."','CCBs end in "-dipine."','Correct! HCTZ is a thiazide diuretic that lowers blood pressure by reducing fluid volume.','ACE inhibitors end in "-pril."']},
+],
+m1match:[
+{d:'Lisinopril',cls:'ACE Inhibitor'},{d:'Metformin',cls:'Biguanide'},{d:'Amoxicillin',cls:'Penicillin Antibiotic'},
+{d:'Atorvastatin',cls:'Statin'},{d:'Albuterol',cls:'Bronchodilator'},{d:'Omeprazole',cls:'PPI'},
+{d:'Metoprolol',cls:'Beta Blocker'},{d:'HCTZ',cls:'Thiazide Diuretic'},{d:'Prednisone',cls:'Corticosteroid'},
+{d:'Warfarin',cls:'Anticoagulant'},{d:'Amlodipine',cls:'CCB'},{d:'Sertraline',cls:'SSRI'},
+],
+
+// ══ MODULE 2: Controlled Substances ══
+m2q:[
+{q:'Schedule IV medications like Xanax can be refilled how many times?',o:['No refills allowed','Up to 5 times within 6 months','Unlimited refills','Once per year'],c:1,r:['Only Schedule II has no-refill rules.','Correct! Schedule III–V meds may be refilled up to 5 times within 6 months.','No controlled substance has unlimited refills.','This is not a standard rule.']},
+{q:'Which is a Schedule II drug that CANNOT be refilled?',o:['Alprazolam (Xanax)','Hydrocodone (Vicodin)','Pregabalin (Lyrica)','Acetaminophen with codeine'],c:1,r:['Alprazolam is Schedule IV — CAN be refilled.','Correct! Hydrocodone is Schedule II — requires a new prescription each time.','Pregabalin is Schedule V.','Acetaminophen/codeine is Schedule III.']},
+{q:'TRAP: Marijuana is classified federally as which schedule?',o:['Schedule I','Schedule II','Schedule III','Not scheduled'],c:0,r:['Correct! Despite state legalization, marijuana remains Schedule I federally.','Schedule II has accepted medical use.','Not currently III federally.','It IS federally scheduled.']},
+{q:'Fentanyl is classified as which schedule?',o:['Schedule I','Schedule II','Schedule III','Schedule IV'],c:1,r:['Schedule I has no accepted medical use; fentanyl does.','Correct! Fentanyl is Schedule II — high abuse potential but accepted medical use.','Schedule III has moderate abuse potential.','Schedule IV has lower abuse potential.']},
+{q:'Which statement about Schedule I drugs is TRUE?',o:['They have accepted medical use with restrictions','They have NO accepted medical use and high abuse potential','They are available over the counter','They can be prescribed by any provider'],c:1,r:['That describes Schedule II.','Correct! Schedule I drugs (heroin, LSD) have no accepted medical use and high abuse potential.','OTC drugs are not scheduled.','Schedule I drugs cannot be prescribed.']},
+{q:'A CMA finds a discrepancy in the controlled substance count. What should they do?',o:['Ignore it — small differences are normal','Report it immediately to the supervisor and document it','Adjust the count to match','Wait until the next scheduled count'],c:1,r:['Discrepancies are NEVER normal for controlled substances.','Correct! Any discrepancy must be reported immediately — it could indicate diversion or theft.','Adjusting counts without explanation violates DEA rules.','Waiting could allow further discrepancies.']},
+{q:'Testosterone is classified as which DEA schedule?',o:['Schedule I','Schedule II','Schedule III','Not scheduled'],c:2,r:['Schedule I has no medical use.','Schedule II has higher abuse potential.','Correct! Testosterone is Schedule III — anabolic steroid with moderate abuse potential.','Testosterone IS a controlled substance.']},
+{q:'Which of these is a Schedule V controlled substance?',o:['Oxycodone','Morphine','Alprazolam','Robitussin AC (low-dose codeine cough syrup)'],c:3,r:['Oxycodone is Schedule II.','Morphine is Schedule II.','Alprazolam is Schedule IV.','Correct! Robitussin AC contains low-dose codeine and is Schedule V.']},
+],
+m2sort:[
+{d:'Heroin',s:'I'},{d:'LSD',s:'I'},{d:'Morphine',s:'II'},{d:'Oxycodone',s:'II'},
+{d:'Adderall',s:'II'},{d:'Fentanyl',s:'II'},{d:'Tylenol w/ Codeine',s:'III'},
+{d:'Testosterone',s:'III'},{d:'Ketamine',s:'III'},{d:'Xanax',s:'IV'},
+{d:'Valium',s:'IV'},{d:'Ambien',s:'IV'},{d:'Robitussin AC',s:'V'},{d:'Lyrica',s:'V'},
+],
+
+// ══ MODULE 3: Side Effects / Adverse / Indication / Contraindication ══
+m3q:[
+{q:'A patient on lisinopril develops a persistent dry cough. This is:',o:['An adverse reaction','A side effect','A contraindication','An allergic reaction'],c:1,r:['Adverse reactions are serious/harmful.','Correct! Dry cough is a common, expected side effect of ACE inhibitors.','A contraindication is a reason NOT to give a drug.','Allergic reactions involve immune response.']},
+{q:'A patient on penicillin develops hives, facial swelling, and difficulty breathing. This is:',o:['A common side effect','An adverse/allergic reaction (anaphylaxis)','A contraindication','An indication'],c:1,r:['Hives and breathing difficulty are NOT common or tolerable.','Correct! Anaphylaxis is a severe allergic/adverse reaction requiring immediate emergency treatment.','This is a reaction, not a contraindication.','An indication is the reason a drug IS given.']},
+{q:'The patient has a sulfa allergy. The provider orders Bactrim (trimethoprim-sulfamethoxazole). What should the CMA do?',o:['Administer as ordered','Notify the provider of the allergy before giving the med','Give it with an antihistamine','Document the allergy and give the medication'],c:1,r:['NEVER give a drug the patient is allergic to.','Correct! Alert the provider — documented sulfa allergy is a contraindication for Bactrim.','Pre-medicating does not make allergens safe.','Documentation alone is not enough.']},
+{q:'"Indication" means:',o:['A reason NOT to give a drug','The approved use/purpose of a drug','A side effect','The route of administration'],c:1,r:['That is a contraindication.','Correct! Indication = the condition for which a drug is approved and prescribed.','Side effects are secondary responses.','Route = how the drug is administered.']},
+{q:'A patient on metoprolol reports dizziness and fatigue. The provider says continue. Why?',o:['These are emergency adverse reactions','These are expected side effects of beta blockers','The drug is not working','These are signs of allergy'],c:1,r:['Dizziness/fatigue from beta blockers are common and not dangerous.','Correct! Beta blockers commonly cause dizziness and fatigue. If mild, the body often adjusts.','These effects don\'t indicate lack of efficacy.','Allergic reactions involve rash, swelling, etc.']},
+{q:'A patient with asthma is prescribed a non-selective beta blocker (propranolol). What is the concern?',o:['Beta blockers help asthma','Non-selective beta blockers can cause bronchospasm — contraindicated in asthma','The drug will have no effect','It will cause high blood sugar'],c:1,r:['Beta blockers do NOT help asthma.','Correct! Non-selective beta blockers block beta-2 receptors in lungs, causing bronchospasm. This is a CONTRAINDICATION in asthma patients.','It would have a harmful effect.','Blood sugar changes are possible but not the primary concern.']},
+{q:'Nausea after taking ibuprofen is best described as:',o:['An adverse reaction','A side effect','A contraindication','An indication'],c:1,r:['Adverse reactions are more serious (e.g., GI bleeding with NSAIDs).','Correct! Nausea is a common, expected side effect of NSAIDs like ibuprofen.','A contraindication is a reason not to give the drug.','An indication is what the drug treats.']},
+{q:'A patient develops Stevens-Johnson Syndrome after taking a new medication. This is:',o:['A minor side effect','An adverse drug reaction','A normal response','An indication'],c:1,r:['SJS is serious and potentially fatal.','Correct! Stevens-Johnson Syndrome is a severe adverse reaction causing skin detachment. It requires immediate medical attention.','This is NOT normal.','An indication is the purpose of the drug.']},
+],
+
+// ══ MODULE 4: Dosage ══
+m4q:[
+{q:'Convert 2.5 grams to milligrams.',o:['25 mg','250 mg','2,500 mg','25,000 mg'],c:2,r:['2.5 × 10 = 25, not the correct conversion.','Missing a zero — 2.5 × 100 ≠ 250.','Correct! 1 g = 1,000 mg, so 2.5 × 1,000 = 2,500 mg.','Too many zeros.']},
+{q:'How many mL is 1 teaspoon?',o:['2.5 mL','5 mL','10 mL','15 mL'],c:1,r:['2.5 mL is half a teaspoon.','Correct! 1 teaspoon = 5 mL. This is a critical conversion for medication dosing.','10 mL = 2 teaspoons.','15 mL = 1 tablespoon.']},
+{q:'Order: 500 mg. Available: 250 mg tablets. How many tablets?',o:['1 tablet','2 tablets','3 tablets','Half a tablet'],c:1,r:['250 mg is only half the dose.','Correct! 500 mg ÷ 250 mg/tablet = 2 tablets.','That would give 750 mg.','That would give only 125 mg.']},
+{q:'Convert 3 tablespoons to mL.',o:['15 mL','30 mL','45 mL','60 mL'],c:2,r:['15 mL = 1 tablespoon.','30 mL = 2 tablespoons.','Correct! 1 tbsp = 15 mL, so 3 × 15 = 45 mL.','60 mL = 4 tablespoons.']},
+{q:'A medication order reads 0.5 g. The pharmacy has 500 mg tablets. How many tablets?',o:['Half a tablet','1 tablet','2 tablets','5 tablets'],c:1,r:['0.5 g = 500 mg, not 250 mg.','Correct! 0.5 g = 500 mg. 500 mg ÷ 500 mg/tablet = 1 tablet.','That would give 1,000 mg (1 g).','That would give 2,500 mg — way too much.']},
+{q:'Convert 154 pounds to kilograms (1 kg = 2.2 lb).',o:['50 kg','60 kg','70 kg','77 kg'],c:2,r:['50 × 2.2 = 110 lb, not 154.','60 × 2.2 = 132 lb, not 154.','Correct! 154 ÷ 2.2 = 70 kg.','77 × 2.2 = 169.4 lb, not 154.']},
+{q:'How many mL in 1 liter?',o:['10 mL','100 mL','1,000 mL','10,000 mL'],c:2,r:['10 mL is 0.01 L.','100 mL is 0.1 L.','Correct! 1 Liter = 1,000 mL.','10,000 mL = 10 L.']},
+{q:'Order: 1 gram of medication. Available: 500 mg capsules. How many capsules?',o:['1 capsule','2 capsules','4 capsules','Half a capsule'],c:1,r:['1 capsule = only 500 mg (half the dose).','Correct! 1 g = 1,000 mg. 1,000 ÷ 500 = 2 capsules.','4 capsules = 2,000 mg = 2 g.','That would give 250 mg.']},
+{q:'A child weighs 22 kg. The dose is 10 mg/kg. What is the total dose?',o:['110 mg','220 mg','22 mg','2,200 mg'],c:1,r:['110 mg would be 5 mg/kg.','Correct! 22 kg × 10 mg/kg = 220 mg.','22 mg would be 1 mg/kg.','2,200 mg would be 100 mg/kg — far too much.']},
+{q:'How many teaspoons are in 1 tablespoon?',o:['2','3','4','5'],c:1,r:['2 tsp = only 10 mL.','Correct! 1 tablespoon = 3 teaspoons (15 mL = 3 × 5 mL).','4 tsp = 20 mL.','5 tsp = 25 mL.']},
+],
+
+// ══ MODULE 5: Med Forms ══
+m5forms:[
+{n:'Tablet',ic:'💊',d:'Solid oral form. Absorbed in GI tract. Can be scored for splitting. NEVER crush enteric-coated or sustained-release tablets.'},
+{n:'Capsule',ic:'🔵',d:'Gelatin shell with powder/liquid. Don\'t open unless directed — some are delayed-release.'},
+{n:'Liquid/Suspension',ic:'🧴',d:'Drug in liquid. Ideal when swallowing pills is difficult. ALWAYS shake suspensions before measuring.'},
+{n:'Transdermal Patch',ic:'🩹',d:'Through-skin delivery over hours/days (fentanyl, nicotine). Apply to clean, dry, hairless skin. Rotate sites.'},
+{n:'Injection',ic:'💉',d:'Via needle: IM, SubQ, IV, ID. IV is fastest (immediate). Requires sterile technique.'},
+{n:'Inhaler',ic:'🌬️',d:'Direct lung delivery for asthma/COPD. Rinse mouth after corticosteroid inhalers to prevent thrush.'},
+{n:'Suppository',ic:'🔶',d:'Rectal/vaginal insertion. Melts at body temperature. Used when oral route isn\'t feasible.'},
+{n:'Sublingual',ic:'👅',d:'Under tongue — rapid absorption into bloodstream. Bypasses GI tract. Example: nitroglycerin for chest pain.'},
+],
+m5q:[
+{q:'A patient cannot swallow pills. Which form is MOST appropriate?',o:['Tablet','Liquid/Suspension','Transdermal patch','Capsule'],c:1,r:['Tablets require swallowing.','Correct! Liquid forms are ideal for patients who cannot swallow solid dosage forms.','Patches work but are not appropriate for all medications.','Capsules also require swallowing.']},
+{q:'Why should you NEVER crush an enteric-coated tablet?',o:['It will taste bad','The enteric coating protects the stomach or ensures drug release in the intestine','It makes the tablet inactive','Crushing is always fine'],c:1,r:['Taste is not the primary concern.','Correct! Enteric coating protects the stomach lining from irritation OR ensures the drug is released in the small intestine for proper absorption.','Crushing changes release, not activity.','Crushing enteric-coated tablets can cause stomach damage.']},
+{q:'After using a corticosteroid inhaler, the patient should:',o:['Eat a meal immediately','Rinse their mouth with water','Take a nap','Drink orange juice'],c:1,r:['Eating is unrelated.','Correct! Rinsing prevents oral thrush (candidiasis), a common side effect of inhaled corticosteroids.','Resting is unrelated.','Juice is unrelated.']},
+{q:'A fentanyl patch delivers medication via which mechanism?',o:['Oral absorption','Transdermal absorption through the skin','Inhalation','Sublingual absorption'],c:1,r:['Patches are not oral.','Correct! Transdermal patches deliver medication through the skin over extended periods.','Patches are not inhaled.','Sublingual is under the tongue.']},
+{q:'Nitroglycerin for acute chest pain is given in what form?',o:['Oral tablet','Sublingual tablet','Transdermal patch','Intramuscular injection'],c:1,r:['Oral is too slow for acute chest pain.','Correct! Sublingual nitroglycerin dissolves under the tongue for rapid absorption and fast relief.','Patches are for prevention, not acute episodes.','IM injection is not the standard route.']},
+{q:'Which medication form MUST be shaken before each dose?',o:['Tablets','Capsules','Suspensions','Sublingual tablets'],c:2,r:['Tablets are solid — no shaking.','Capsules are solid — no shaking.','Correct! Suspensions contain particles that settle. Shaking ensures uniform drug distribution.','Sublingual tablets dissolve under the tongue.']},
+],
+
+// ══ MODULE 6: Look-Alike ══
+m6pairs:[
+{a:'Hydroxyzine',b:'Hydralazine',da:'Antihistamine — anxiety & allergies',db:'Antihypertensive — lowers blood pressure',risk:'Hydralazine for anxiety → dangerous hypotension.'},
+{a:'Metformin',b:'Metoprolol',da:'Antidiabetic — lowers blood sugar',db:'Beta blocker — lowers heart rate & BP',risk:'Confusion → hypoglycemia or bradycardia.'},
+{a:'Celebrex',b:'Celexa',da:'NSAID (celecoxib) — pain/inflammation',db:'SSRI (citalopram) — depression',risk:'NSAID for depression is ineffective and harmful.'},
+{a:'Clonidine',b:'Klonopin',da:'Antihypertensive — lowers BP',db:'Benzodiazepine — seizures/anxiety',risk:'Clonidine for anxiety → severe hypotension.'},
+{a:'Prednisone',b:'Prednisolone',da:'Prodrug — needs liver conversion',db:'Active form — for impaired liver function',risk:'Prednisone in liver failure → no therapeutic effect.'},
+],
+m6q:[
+{q:'A pharmacy tech confuses hydroxyzine with hydralazine. If the patient receives hydralazine instead of hydroxyzine, what could happen?',o:['The patient would feel more anxious','The patient could develop dangerous hypotension','Nothing — they are the same drug','The patient would develop a rash'],c:1,r:['Hydralazine lowers BP, not treats anxiety.','Correct! Hydralazine is an antihypertensive. Given to a patient who needed an antihistamine (hydroxyzine), it could cause dangerous drops in blood pressure.','They are completely different drugs.','Rash is not the primary concern.']},
+{q:'Celebrex and Celexa are often confused. Celebrex is a(n):',o:['SSRI antidepressant','NSAID for pain and inflammation','Beta blocker','Opioid analgesic'],c:1,r:['That\'s Celexa (citalopram).','Correct! Celebrex (celecoxib) is an NSAID used for pain and inflammation. Celexa (citalopram) is the SSRI.','Neither is a beta blocker.','Neither is an opioid.']},
+{q:'Why are look-alike/sound-alike (LASA) drugs considered a patient safety concern?',o:['They cost different amounts','Confusion can lead to wrong drug administration and patient harm','They always have the same ingredients','They are manufactured by the same company'],c:1,r:['Cost is not the primary concern.','Correct! LASA drugs can be confused due to similar names, leading to wrong drug errors that can harm or kill patients.','They have different ingredients and actions.','Different manufacturers can make similarly named drugs.']},
+{q:'Which strategy helps prevent LASA medication errors?',o:['Use Tall Man Lettering (e.g., hydrOXYzine vs hydrALAZINE)','Only stock one of the two drugs','Ignore the issue — errors are rare','Let patients choose their medication'],c:0,r:['Correct! Tall Man Lettering highlights the differences in similar drug names to prevent confusion. ISMP recommends this strategy.','Both drugs may be needed.','LASA errors are a leading cause of medication errors.','Patients cannot choose prescription medications.']},
+],
+
+// ══ MODULE 7: Routes ══
+m7q:[
+{q:'A patient is having an acute asthma attack. Which route provides the FASTEST relief?',o:['Oral (PO)','Inhalation','Subcutaneous','Transdermal'],c:1,r:['Oral takes 30-60 minutes.','Correct! Inhalation delivers medication directly to the lungs within seconds.','SubQ is slower for respiratory emergencies.','Transdermal takes hours.']},
+{q:'Why does IV administration have 100% bioavailability?',o:['It absorbs through the skin','It goes directly into the bloodstream','It is the most common route','It is the safest route'],c:1,r:['That\'s transdermal.','Correct! IV places the drug directly into the bloodstream — no absorption needed.','Oral is most common.','IV actually carries more risks (infection, embolism).']},
+{q:'Insulin is typically given by which route?',o:['Oral (PO)','Intravenous (IV)','Subcutaneous (SubQ)','Intramuscular (IM)'],c:2,r:['Insulin is destroyed by stomach acid — cannot be given orally.','IV insulin exists but is used in hospital settings only.','Correct! Subcutaneous injection allows slow, sustained absorption for blood sugar control.','IM insulin absorbs too quickly for daily use.']},
+{q:'Where is a PPD (TB test) injected?',o:['Intramuscular (IM)','Subcutaneous (SubQ)','Intradermal (ID)','Intravenous (IV)'],c:2,r:['IM is too deep for a skin test.','SubQ is deeper than needed.','Correct! PPD is injected intradermally (into the dermis layer) and read 48-72 hours later.','IV is not used for skin tests.']},
+{q:'A patient is experiencing anaphylaxis. Epinephrine should be given by which route?',o:['Oral','Intramuscular (IM) — lateral thigh','Transdermal','Sublingual'],c:1,r:['Oral is too slow for emergencies.','Correct! IM injection in the lateral thigh (EpiPen site) provides rapid systemic absorption during anaphylaxis.','Transdermal is too slow.','Sublingual is not standard for epinephrine.']},
+{q:'Which route bypasses the GI tract and first-pass metabolism?',o:['Oral (PO)','Sublingual (SL)','Oral with food','Oral with water'],c:1,r:['Oral goes through the GI tract and liver first.','Correct! Sublingual absorption goes directly into the bloodstream, bypassing the GI tract and liver first-pass effect.','Food affects absorption but doesn\'t bypass GI.','Water helps swallowing but doesn\'t change the route.']},
+{q:'A fentanyl patch uses which route of administration?',o:['Oral','Sublingual','Transdermal','Intravenous'],c:2,r:['Patches are not taken orally.','Sublingual is under the tongue.','Correct! Transdermal patches deliver medication through the skin continuously over hours/days.','IV requires needle access.']},
+{q:'Which route is used for most vaccines in adults?',o:['Oral (PO)','Subcutaneous (SubQ)','Intramuscular (IM)','Intradermal (ID)'],c:2,r:['Most vaccines are injectable, not oral.','Some vaccines are SubQ, but most adult vaccines are IM.','Correct! Most adult vaccines (flu, COVID, Tdap) are given intramuscularly, typically in the deltoid.','ID is used for PPD/TB testing, not most vaccines.']},
+],
+m7match:[
+{d:'Nitroglycerin',r:'Sublingual (SL)'},{d:'Insulin',r:'Subcutaneous (SubQ)'},{d:'Albuterol',r:'Inhalation'},
+{d:'Amoxicillin',r:'Oral (PO)'},{d:'Epinephrine (EpiPen)',r:'Intramuscular (IM)'},{d:'Vancomycin',r:'Intravenous (IV)'},
+{d:'PPD/TB test',r:'Intradermal (ID)'},{d:'Fentanyl patch',r:'Transdermal'},
+],
+
+// ══ MODULE 8: Pharmacokinetics ══
+m8q:[
+{q:'Which route has the FASTEST drug absorption?',o:['Oral','Intravenous','Subcutaneous','Transdermal'],c:1,r:['Oral must pass through GI tract first.','Correct! IV bypasses all absorption barriers — drug enters bloodstream immediately.','SubQ is slower than IV.','Transdermal is the slowest.']},
+{q:'A highly protein-bound drug means:',o:['More drug is free and active','Less drug is free and active','The drug works faster','The drug is excreted faster'],c:1,r:['High protein binding means LESS free drug.','Correct! Protein-bound drug is inactive. Only the unbound (free) portion produces pharmacological effects.','Protein binding can actually slow the effect.','Protein binding can slow excretion.']},
+{q:'Most drug metabolism occurs in the:',o:['Kidneys','Liver','Lungs','Stomach'],c:1,r:['Kidneys handle excretion.','Correct! The liver is the primary site of drug metabolism (biotransformation) via cytochrome P450 enzymes.','Lungs excrete some gases.','Stomach absorbs but doesn\'t metabolize most drugs.']},
+{q:'The primary organ of drug excretion is the:',o:['Liver','Kidneys','Lungs','Skin'],c:1,r:['Liver handles metabolism, not primary excretion.','Correct! The kidneys filter drugs/metabolites into urine — the primary route of drug excretion.','Lungs excrete some volatile substances.','Skin excretes minimal amounts.']},
+{q:'The "first-pass effect" refers to:',o:['The first dose of a new medication','Drug metabolism by the liver before reaching systemic circulation','How quickly a drug is absorbed','The first side effect experienced'],c:1,r:['Not about the first dose.','Correct! Oral drugs pass through the liver first, where some are metabolized before reaching the bloodstream, reducing bioavailability.','Absorption rate is not the first-pass effect.','Not about side effects.']},
+{q:'Which of the following would SLOW drug absorption?',o:['Giving the drug IV','Taking the drug with food','Giving the drug sublingually','Taking the drug on an empty stomach'],c:1,r:['IV bypasses absorption entirely.','Correct! Food in the stomach can slow absorption of oral medications by delaying gastric emptying.','Sublingual is one of the fastest non-IV routes.','Empty stomach usually speeds absorption.']},
+{q:'A patient with severe kidney disease is at risk for:',o:['Faster drug metabolism','Drug accumulation and toxicity','No effect on medications','Faster absorption'],c:1,r:['Kidneys don\'t primarily metabolize drugs.','Correct! Impaired kidneys can\'t excrete drugs properly, leading to accumulation and potential toxicity. Dose adjustments are often needed.','Kidney disease significantly affects medication levels.','Absorption occurs in the GI tract, not kidneys.']},
+{q:'ADME stands for:',o:['Administration, Delivery, Monitoring, Evaluation','Absorption, Distribution, Metabolism, Excretion','Assessment, Diagnosis, Management, Education','None of the above'],c:1,r:['This is a nursing process, not pharmacokinetics.','Correct! ADME describes the four stages of pharmacokinetics: how drugs move through the body.','This is a clinical framework.','ADME is a standard pharmacokinetic term.']},
+],
+
+// ══ MODULE 9: Rights ══
+m9q:[
+{q:'A patient\'s armband says "Mary Johnson" but she says "Mary Johnston." What do you do?',o:['Give the med — names sound the same','Verify with two patient identifiers (name + DOB)','Ask the nurse to verify','Skip this patient'],c:1,r:['Similar names are a major safety risk.','Correct! ALWAYS verify with TWO identifiers (name + DOB). Similar-sounding names can lead to wrong-patient errors.','You should verify yourself, not delegate.','Skipping delays necessary treatment.']},
+{q:'Order: Metoprolol 25 mg PO. Available: 50 mg scored tablets. What do you do?',o:['Give half of the scored tablet','Give a whole tablet — it\'s close enough','Call the pharmacy','Crush and estimate half'],c:0,r:['Correct! If a tablet is scored, it is designed to be split. Give half of the 50 mg scored tablet for 25 mg.','NEVER give "close enough" — accuracy matters.','Only needed if not scored.','Crushing and estimating is inaccurate.']},
+{q:'A medication is ordered for 0800. It\'s now 0830. Is this acceptable?',o:['No — must be given at exactly 0800','Yes — within 30 minutes is the standard acceptable window','Yes — any time during the shift','Only if the patient requests it'],c:1,r:['Exact timing is not always required.','Correct! The standard acceptable window is 30 minutes before or after scheduled time. 0830 is within range for 0800.','Any time during the shift is too broad.','Timing is based on the order, not patient requests.']},
+{q:'A patient refuses medication. What should the CMA do?',o:['Explain importance and force the patient to take it','Respect their right to refuse, document, and notify provider','Crush it and put it in food','Leave it at bedside for later'],c:1,r:['NEVER force medication on a patient.','Correct! Patients have the RIGHT TO REFUSE. Document the refusal and notify the provider.','Hiding medication in food is unethical and dangerous.','Leaving medication unattended is a safety hazard.']},
+{q:'Before administering any medication, how many patient identifiers must you verify?',o:['One — just the patient\'s name','Two — typically name and date of birth','Three — name, DOB, and room number','None if you recognize the patient'],c:1,r:['One identifier is insufficient.','Correct! The Joint Commission requires at least TWO patient identifiers before any medication administration.','Room number is NOT an acceptable identifier (patients move).','ALWAYS verify — memory is not reliable enough for medication safety.']},
+{q:'You notice the prescribed medication looks different than usual. What should you do?',o:['Give it anyway — the pharmacy filled it','Verify with the pharmacy before administering (Right Drug)','Ask the patient if they want it','Throw it away and get a new one'],c:1,r:['Changes in appearance could indicate an error.','Correct! Always verify with the pharmacy. Generic manufacturers may change appearance, but it could also be the wrong drug.','Patients can\'t verify drug accuracy.','Don\'t discard without verification.']},
+{q:'Which of the following is NOT one of the "Rights" of medication administration?',o:['Right Patient','Right Cost','Right Route','Right Documentation'],c:1,r:['Right Patient is one of the rights.','Correct! "Right Cost" is NOT one of the medication rights. The standard rights include Patient, Drug, Dose, Route, Time, Documentation, Reason, Response, to Refuse, and Education.','Right Route is one of the rights.','Right Documentation is one of the rights.']},
+{q:'"Right Documentation" means:',o:['Documenting the medication BEFORE giving it','Documenting the medication AFTER giving it, including time, dose, route, and response','Only documenting if there\'s a problem','The patient documents their own medications'],c:1,r:['Never document before — what if you don\'t give it?','Correct! Document AFTER administration, including what was given, dose, route, time, and patient response.','All medication administrations must be documented.','Healthcare providers document, not patients.']},
+],
+
+// ══ MODULE 10: Storage ══
+m10q:[
+{q:'A patient brings in expired insulin. What should you advise?',o:['Fine to use if it looks clear','Discard and obtain a new prescription','Freeze it to extend the date','Use at double the dose since it\'s weaker'],c:1,r:['Expired meds may have reduced potency.','Correct! Expired medications should be discarded. Insulin degrades past expiration.','Freezing destroys insulin.','Doubling doses is dangerous.']},
+{q:'Most vaccines should be stored at:',o:['Room temperature','36°F–46°F (2°C–8°C) in a refrigerator','0°F in a freezer','Any temperature is fine'],c:1,r:['Room temp degrades most vaccines.','Correct! Most vaccines need refrigeration at 36°F–46°F. Temperature logs must be maintained daily.','Most vaccines should NOT be frozen.','Temperature control is critical for vaccine efficacy.']},
+{q:'Controlled substances must be stored in:',o:['Regular medication cabinet','A double-locked cabinet with access logs','The refrigerator','The provider\'s office desk'],c:1,r:['Regular cabinets lack required security.','Correct! DEA requires controlled substances in double-locked storage with access logs and regular inventory counts.','Refrigeration is for temp-sensitive drugs.','This violates all regulations.']},
+{q:'A label says "Protect from light." How should the medication be stored?',o:['In a clear container on the counter','In the original amber or opaque container away from light','Under a lamp for visibility','In the refrigerator'],c:1,r:['Clear containers expose drugs to light degradation.','Correct! Light-sensitive medications stay in amber/opaque containers away from direct light.','Light degrades the medication.','Refrigeration is for temp-sensitive drugs.']},
+{q:'How should a patient dispose of unused opioid medications at home?',o:['Flush them down the toilet','Use a drug take-back program or mix with coffee grounds/kitty litter and throw away','Leave them in the medicine cabinet','Give them to a friend who has pain'],c:1,r:['Flushing is only recommended for certain specific drugs per FDA.','Correct! Drug take-back programs are preferred. If unavailable, mix with undesirable substance and place in sealed container in trash.','Keeping unused opioids is a safety and diversion risk.','Sharing prescriptions is illegal.']},
+{q:'Nitroglycerin tablets should be stored in:',o:['A plastic container','The original dark glass container, tightly sealed','A clear zip-lock bag','Any container is fine'],c:1,r:['Plastic can absorb nitroglycerin.','Correct! Nitroglycerin is light-sensitive and volatile. It must be kept in its original dark glass container, tightly sealed, to maintain potency.','Clear bags expose it to light.','Container type matters for nitroglycerin stability.']},
+{q:'What is a "temperature log" used for in medication storage?',o:['To track patient temperatures','To record daily refrigerator/freezer temperatures for vaccine storage','To measure room temperature for comfort','To log the temperature outside'],c:1,r:['That\'s a patient vital sign.','Correct! Temperature logs document daily fridge/freezer temps to ensure vaccines and temperature-sensitive meds are stored properly. Required by CDC and state guidelines.','Room comfort is unrelated.','Outside temperature is irrelevant.']},
+],
+
+// ══ MODULE 11: Drug Info & FDA ══
+m11q:[
+{q:'The BEST place for a CMA to find drug side effects is:',o:['A random internet search','The medication package insert (prescribing information)','Social media health groups','The patient\'s family'],c:1,r:['Internet may give unreliable info.','Correct! The package insert (PI) is the FDA-approved, comprehensive drug information source.','Social media is NOT reliable.','Family may have inaccurate info.']},
+{q:'The FDA\'s role in pharmacology includes:',o:['Manufacturing all medications','Approving drugs for safety and efficacy before market release','Setting drug prices','Performing surgeries'],c:1,r:['Pharma companies manufacture drugs.','Correct! The FDA evaluates and approves drugs for safety and effectiveness before they can be marketed.','FDA does not set prices.','FDA doesn\'t perform surgeries.']},
+{q:'Which resource checks drug interactions?',o:['PDR or drug interaction database (Lexicomp, Epocrates)','Patient\'s insurance card','Office supply catalog','Medical dictionary'],c:0,r:['Correct! The PDR, Lexicomp, Micromedex, and Epocrates are standard drug interaction references.','Insurance cards have coverage info only.','Supply catalogs are irrelevant.','Dictionaries define terms, not interactions.']},
+{q:'A prescription label includes all of the following EXCEPT:',o:['Patient name and drug name','Dosage and frequency','The chemical synthesis process','Prescriber information and refill count'],c:2,r:['Patient name and drug name are on the label.','Dosage and frequency are on the label.','Correct! The chemical synthesis process is proprietary manufacturing info — NOT on prescription labels.','Prescriber info and refills ARE on the label.']},
+{q:'What does "NDC number" stand for on a medication label?',o:['National Drug Code','New Drug Classification','Non-Dangerous Chemical','National Dosage Chart'],c:0,r:['Correct! NDC (National Drug Code) is a unique identifier for each drug product, used for tracking and billing.','That\'s not what NDC stands for.','Not a real term.','Not a real term.']},
+{q:'The "Black Box Warning" on a medication means:',o:['The drug is available over the counter','The FDA has identified serious or life-threatening risks','The drug is no longer manufactured','The drug tastes bad'],c:1,r:['Black box warnings are for serious prescription drugs.','Correct! A Black Box Warning is the FDA\'s strongest warning, indicating serious or life-threatening risks associated with the medication.','The drug is still available.','Taste is not related.']},
+{q:'A "drug recall" by the FDA means:',o:['The drug price is being lowered','The drug has been found to have safety issues and is being removed or corrected','The drug is being promoted','The drug is being reclassified'],c:1,r:['Recalls are about safety, not pricing.','Correct! FDA drug recalls remove unsafe products from the market. There are 3 classes based on severity.','Recalls are safety actions, not promotions.','Recalls are not reclassifications.']},
+{q:'Which FDA recall class is the MOST serious?',o:['Class I — reasonable probability of serious adverse health consequences or death','Class II — may cause temporary adverse effects','Class III — unlikely to cause adverse effects','All classes are equally serious'],c:0,r:['Correct! Class I is the most serious — there is a reasonable probability that the product will cause serious health consequences or death.','Class II is serious but less than Class I.','Class III is the least serious.','They vary in severity.']},
+],
+
+// ══ SIMULATION ══
+simCases:[
+{pt:'Maria Garcia, 58F',cc:'Persistent high blood pressure despite lifestyle changes',
+ vit:'BP: 162/98, HR: 78, RR: 16, Temp: 98.6°F',hx:'Type 2 diabetes (on metformin), NKDA',
+ ax:'Stage 2 hypertension, uncontrolled',
+ steps:[
+  {q:'What drug CLASS is most appropriate?',o:['ACE Inhibitor','Opioid Analgesic','Bronchodilator','Antidepressant'],c:0,rat:'ACE inhibitors are first-line for hypertension, especially in diabetic patients — they protect kidney function.'},
+  {q:'Which specific medication might be prescribed?',o:['Lisinopril 10mg','Morphine 5mg','Albuterol 90mcg','Sertraline 50mg'],c:0,rat:'Lisinopril ("-pril" = ACE inhibitor) is appropriate for hypertension with diabetes.'},
+  {q:'By what route?',o:['IV','IM','Oral (PO)','SubQ'],c:2,rat:'Lisinopril is an oral medication taken by mouth daily.'},
+  {q:'What side effect should you educate about?',o:['Persistent dry cough','Hair color change','Improved vision','Weight gain of 50 lbs'],c:0,rat:'Dry cough is a well-known ACE inhibitor side effect due to bradykinin accumulation.'},
+  {q:'The patient plans to become pregnant. What is the concern?',o:['ACE inhibitors are safe in pregnancy','ACE inhibitors are CONTRAINDICATED — teratogenic','Pregnancy makes the drug more effective','No concern'],c:1,rat:'ACE inhibitors are CONTRAINDICATED in pregnancy — can cause fetal kidney damage and death.'},
+ ]},
+{pt:'James Wilson, 34M',cc:'Sudden wheezing and shortness of breath',
+ vit:'BP: 130/82, HR: 110, RR: 28, SpO2: 91%, Temp: 98.2°F',hx:'Asthma since childhood, PRN inhaler. Allergic to aspirin.',
+ ax:'Acute asthma exacerbation',
+ steps:[
+  {q:'What drug class is needed for IMMEDIATE relief?',o:['Short-acting beta-agonist (SABA)','ACE Inhibitor','Anticoagulant','PPI'],c:0,rat:'SABAs like albuterol provide rapid bronchodilation for acute asthma.'},
+  {q:'Which medication should be given?',o:['Albuterol','Lisinopril','Warfarin','Omeprazole'],c:0,rat:'Albuterol is the standard rescue inhaler for acute bronchospasm.'},
+  {q:'What is the correct route?',o:['Oral','Inhalation (nebulizer/MDI)','Transdermal','Rectal'],c:1,rat:'Inhalation delivers albuterol directly to the lungs for fastest relief.'},
+  {q:'The patient also has chest pain. Can you give aspirin?',o:['Yes — aspirin helps chest pain','No — documented aspirin allergy is a CONTRAINDICATION','Yes, but only half','Give it rectally to avoid allergy'],c:1,rat:'Documented aspirin allergy is an absolute contraindication — could trigger bronchospasm or anaphylaxis.'},
+  {q:'After treatment, SpO2 improves to 97%. What "Right" are you confirming by monitoring this?',o:['Right Patient','Right Drug','Right Response','Right Route'],c:2,rat:'Monitoring the patient\'s response ensures the medication is working as expected — this is the Right Response.'},
+ ]},
+{pt:'Dorothy Chen, 72F',cc:'New onset of irregular heartbeat and blood clots',
+ vit:'BP: 138/86, HR: 112 (irregular), RR: 18, Temp: 98.4°F',hx:'Atrial fibrillation, osteoarthritis. Takes ibuprofen daily.',
+ ax:'Atrial fibrillation with thromboembolic risk',
+ steps:[
+  {q:'What drug class is needed to prevent blood clots?',o:['Anticoagulant','Bronchodilator','Antidepressant','Corticosteroid'],c:0,rat:'Anticoagulants prevent clot formation in atrial fibrillation, reducing stroke risk.'},
+  {q:'Which medication might be prescribed?',o:['Warfarin','Albuterol','Metformin','Prednisone'],c:0,rat:'Warfarin is a common anticoagulant for atrial fibrillation.'},
+  {q:'The patient takes ibuprofen daily for arthritis. What is the concern with adding warfarin?',o:['No concern — they treat different conditions','NSAIDs increase bleeding risk when combined with anticoagulants','Ibuprofen makes warfarin more effective','Warfarin treats arthritis too'],c:1,rat:'NSAIDs + anticoagulants = significantly increased bleeding risk. The provider must be notified.'},
+  {q:'What lab test must be monitored regularly with warfarin?',o:['Blood glucose','INR/PT (prothrombin time)','Thyroid levels','Hemoglobin A1C'],c:1,rat:'INR/PT monitors warfarin\'s anticoagulant effect. Goal INR is typically 2.0-3.0 for atrial fibrillation.'},
+ ]},
+],
+};
+
+// ═══════════════════════════════════════════
+// MODULE LOADERS
+// ═══════════════════════════════════════════
+function hdr(ic,t,d,c){return `<div class="mi"><div class="mi-ic" style="background:${c}15;color:${c}">${ic}</div><div><h2>${t}</h2><p>${d}</p></div></div>`}
+
+function loadMod(id){
+  const el=document.getElementById(id);
+  switch(id){
+    case 'm1':rM1(el);break;case 'm2':rM2(el);break;case 'm3':rM3(el);break;
+    case 'm4':rM4(el);break;case 'm5':rM5(el);break;case 'm6':rM6(el);break;
+    case 'm7':rM7(el);break;case 'm8':rM8(el);break;case 'm9':rM9(el);break;
+    case 'm10':rM10(el);break;case 'm11':rM11(el);break;case 'sim':rSim(el);break;
+  }
+}
+
+// ═══ M1: Drug Classifications ═══
+function rM1(el){
+  el.innerHTML=hdr('💊','Drug Classifications (K14, K15)','Match drugs to classes. Learn suffix patterns. 10 scenario questions.','var(--pri)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m1Match()">🎮 Matching Game</button>
+    <button class="btn btn-o btn-s" onclick="m1Quiz()">📝 Scenario Quiz (10 Q)</button>
+  </div></div><div id="m1c"></div>`;
+}
+function m1Match(){
+  const c=document.getElementById('m1c');
+  const items=sh(D.m1match).slice(0,6);
+  c.innerHTML=`<div class="card fade-in"><h3>Match Drug → Class</h3><p class="sub">Drag each drug to its correct classification.</p>
+    <div class="chip-pool" id="m1p"></div><div class="drop-zones" id="m1z"></div>
+    <div id="m1f"></div><button class="btn btn-p btn-s" style="margin-top:12px" onclick="m1Match()">🔄 New Set</button></div>`;
+  const pool=document.getElementById('m1p');
+  sh(items).forEach(it=>{
+    const ch=document.createElement('div');ch.className='chip';ch.style.cssText='background:var(--pri-light);color:var(--pri)';
+    ch.textContent=it.d;ch.draggable=true;ch.id='ch_'+it.d.replace(/\s/g,'');
+    ch.ondragstart=e=>{e.dataTransfer.setData('text',it.d);ch.style.opacity='.4'};
+    ch.ondragend=()=>{ch.style.opacity='1'};
+    pool.appendChild(ch);
+  });
+  const zones=document.getElementById('m1z');
+  sh(items).forEach(it=>{
+    const z=document.createElement('div');z.className='dz';
+    z.innerHTML=`<div class="dz-t">${it.cls}</div><div class="dz-items"></div>`;
+    z.ondragover=e=>{e.preventDefault();z.classList.add('over')};
+    z.ondragleave=()=>z.classList.remove('over');
+    z.ondrop=e=>{
+      e.preventDefault();z.classList.remove('over');
+      const name=e.dataTransfer.getData('text');const correct=it.d===name;
+      if(correct){
+        z.querySelector('.dz-items').innerHTML+=`<span class="chip" style="background:var(--green-light);color:#065f46;cursor:default">${name}</span>`;
+        const ch=document.getElementById('ch_'+name.replace(/\s/g,''));if(ch)ch.classList.add('used');
+        sndOk();addPts(5,'m1');track('m1',true);toast('✓ Correct match!');
+      }else{sndNo();track('m1',false);toast(`✗ ${name} ≠ ${it.cls}`,'e');z.style.animation='shake .4s';setTimeout(()=>z.style.animation='',400)}
+    };
+    zones.appendChild(z);
+  });
+}
+function m1Quiz(){runQuiz(document.getElementById('m1c'),D.m1q,'m1',el=>{el.innerHTML=doneMsgHTML('m1')})}
+
+// ═══ M2: Controlled Substances ═══
+function rM2(el){
+  el.innerHTML=hdr('🔒','Controlled Substances (Schedules I-V)','Sort drugs by DEA schedule. Watch for NHA trap questions.','var(--purple)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m2Sort()">🎮 Schedule Sorting</button>
+    <button class="btn btn-o btn-s" onclick="m2Quiz()">📝 Quiz (8 Q)</button>
+  </div></div><div id="m2c"></div>`;
+}
+function m2Sort(){
+  const c=document.getElementById('m2c');
+  const items=sh(D.m2sort).slice(0,8);
+  c.innerHTML=`<div class="card fade-in"><h3>Sort Drugs by DEA Schedule</h3><p class="sub">Drag each drug into its correct schedule.</p>
+    <div class="chip-pool" id="m2p"></div><div class="drop-zones" style="grid-template-columns:repeat(5,1fr)" id="m2z"></div>
+    <div id="m2f"></div><button class="btn btn-p btn-s" style="margin-top:12px" onclick="m2Sort()">🔄 New Set</button></div>`;
+  const pool=document.getElementById('m2p');
+  items.forEach(it=>{
+    const ch=document.createElement('div');ch.className='chip';ch.style.cssText='background:var(--purple-light);color:var(--purple)';
+    ch.textContent=it.d;ch.draggable=true;ch.id='s2_'+it.d.replace(/[^a-zA-Z]/g,'');
+    ch.ondragstart=e=>{e.dataTransfer.setData('text',JSON.stringify(it));ch.style.opacity='.4'};
+    ch.ondragend=()=>ch.style.opacity='1';
+    pool.appendChild(ch);
+  });
+  const zones=document.getElementById('m2z');
+  ['I','II','III','IV','V'].forEach(sch=>{
+    const z=document.createElement('div');z.className='dz';
+    z.innerHTML=`<div class="dz-t">Sch ${sch}</div><div class="dz-items"></div>`;
+    z.ondragover=e=>{e.preventDefault();z.classList.add('over')};
+    z.ondragleave=()=>z.classList.remove('over');
+    z.ondrop=e=>{
+      e.preventDefault();z.classList.remove('over');
+      const it=JSON.parse(e.dataTransfer.getData('text'));
+      if(it.s===sch){
+        z.querySelector('.dz-items').innerHTML+=`<span class="chip" style="background:var(--green-light);color:#065f46;cursor:default;font-size:11px">${it.d}</span>`;
+        const ch=document.getElementById('s2_'+it.d.replace(/[^a-zA-Z]/g,''));if(ch)ch.classList.add('used');
+        sndOk();addPts(5,'m2');track('m2',true);toast(`✓ ${it.d} → Schedule ${sch}`);
+      }else{sndNo();track('m2',false);toast(`✗ ${it.d} is Schedule ${it.s}, not ${sch}`,'e')}
+    };
+    zones.appendChild(z);
+  });
+}
+function m2Quiz(){runQuiz(document.getElementById('m2c'),D.m2q,'m2',el=>{el.innerHTML=doneMsgHTML('m2')})}
+
+// ═══ M3: Side Effects ═══
+function rM3(el){
+  el.innerHTML=hdr('⚠️','Side Effect vs Adverse vs Indication vs Contraindication (K16)','Case-based clinical reasoning. 8 scenario questions.','var(--red)');
+  el.innerHTML+=`<div id="m3c"></div>`;
+  runQuiz(document.getElementById('m3c'),D.m3q,'m3',el=>{el.innerHTML=doneMsgHTML('m3')});
+}
+
+// ═══ M4: Dosage ═══
+function rM4(el){
+  el.innerHTML=hdr('🧮','Dosage & Measurements (K17)','Conversions, calculations, and clinical dosing problems. 10 questions.','var(--orange)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m4Calc()">🧮 Calculator Problems</button>
+    <button class="btn btn-o btn-s" onclick="m4Quiz()">📝 MCQ Quiz (10 Q)</button>
+  </div></div><div id="m4c"></div>`;
+}
+function m4Calc(){
+  const c=document.getElementById('m4c');
+  const probs=[
+    {q:'Convert 2.5 grams to milligrams',a:2500,u:'mg',s:['1 g = 1,000 mg','2.5 × 1,000 = 2,500 mg']},
+    {q:'Convert 500 mL to liters',a:0.5,u:'L',s:['1,000 mL = 1 L','500 ÷ 1,000 = 0.5 L']},
+    {q:'How many mL in 2 teaspoons?',a:10,u:'mL',s:['1 tsp = 5 mL','2 × 5 = 10 mL']},
+    {q:'Convert 3 tablespoons to mL',a:45,u:'mL',s:['1 tbsp = 15 mL','3 × 15 = 45 mL']},
+    {q:'Order: 0.25 g. Available: 250 mg tablets. How many tablets?',a:1,u:'tablet(s)',s:['0.25 g = 250 mg','250 mg ÷ 250 mg/tab = 1 tablet']},
+    {q:'Order: 750 mg. Available: 250 mg/tablet. How many tablets?',a:3,u:'tablet(s)',s:['750 ÷ 250 = 3 tablets']},
+    {q:'Convert 10 kg to pounds (1 kg = 2.2 lb)',a:22,u:'lb',s:['10 × 2.2 = 22 lb']},
+    {q:'Dose: 5 mg/kg. Patient weighs 80 kg. Total dose?',a:400,u:'mg',s:['5 mg/kg × 80 kg = 400 mg']},
+  ];
+  let idx=0;const list=sh(probs);
+  function showP(){
+    if(idx>=list.length){c.innerHTML=doneMsgHTML('m4');return}
+    const p=list[idx];
+    c.innerHTML=`<div class="card fade-in"><div class="qc">Problem ${idx+1} of ${list.length}</div>
+      <div class="calc-box">${p.q}</div>
+      <div class="calc-row"><input type="number" step="any" id="ci" placeholder="?" autofocus><span>${p.u}</span>
+      <button class="btn btn-p btn-s" id="csub">Check</button></div>
+      <div id="cfb"></div>
+      <button class="btn btn-o btn-s" style="margin-top:12px" id="cnx">Next →</button></div>`;
+    document.getElementById('csub').onclick=()=>{
+      const v=parseFloat(document.getElementById('ci').value);
+      if(isNaN(v)){document.getElementById('cfb').innerHTML='<div class="rat rat-r">Please enter a number.</div>';return}
+      const ok=Math.abs(v-p.a)<0.05;
+      if(ok){sndOk();addPts(10,'m4');track('m4',true);toast('✓ Correct! +10')}else{sndNo();track('m4',false)}
+      document.getElementById('cfb').innerHTML=`<div class="rat ${ok?'rat-g':'rat-r'}"><strong>${ok?'✓ Correct!':'✗ Incorrect — answer is '+p.a}</strong><br><br><strong>Steps:</strong><br>${p.s.map(x=>'→ '+x).join('<br>')}</div>`;
+      document.getElementById('csub').disabled=true;
+    };
+    document.getElementById('ci').onkeydown=e=>{if(e.key==='Enter')document.getElementById('csub').click()};
+    document.getElementById('cnx').onclick=()=>{idx++;showP()};
+  }
+  showP();
+}
+function m4Quiz(){runQuiz(document.getElementById('m4c'),D.m4q,'m4',el=>{el.innerHTML=doneMsgHTML('m4')})}
+
+// ═══ M5: Med Forms ═══
+function rM5(el){
+  el.innerHTML=hdr('💉','Forms of Medication (K18)','Click to learn forms, then test your knowledge. 6 quiz questions.','var(--teal)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m5Cards()">📖 Learn Forms</button>
+    <button class="btn btn-o btn-s" onclick="m5Quiz()">📝 Quiz (6 Q)</button>
+  </div></div><div id="m5c"></div>`;
+}
+function m5Cards(){
+  const c=document.getElementById('m5c');
+  c.innerHTML='<div class="click-grid" id="m5g"></div>';
+  D.m5forms.forEach(f=>{
+    document.getElementById('m5g').innerHTML+=`<div class="cc" onclick="this.classList.toggle('open')">
+      <div class="ic">${f.ic}</div><div class="tt">${f.n}</div>
+      <div style="font-size:12px;color:var(--text3)">Tap to learn</div>
+      <div class="det">${f.d}</div></div>`;
+  });
+}
+function m5Quiz(){runQuiz(document.getElementById('m5c'),D.m5q,'m5',el=>{el.innerHTML=doneMsgHTML('m5')})}
+
+// ═══ M6: Look-Alike ═══
+function rM6(el){
+  el.innerHTML=hdr('👀','Look-Alike / Sound-Alike Drugs (K19)','High-risk safety content. Learn pairs + timed challenge + quiz.','var(--pink)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m6Learn()">📖 Learn Pairs</button>
+    <button class="btn btn-o btn-s" onclick="m6Timed()">⏱️ Timed Challenge</button>
+    <button class="btn btn-o btn-s" onclick="m6Quiz()">📝 Quiz (4 Q)</button>
+  </div></div><div id="m6c"></div>`;
+}
+function m6Learn(){
+  const c=document.getElementById('m6c');let h='';
+  D.m6pairs.forEach(p=>{
+    h+=`<div class="card fade-in"><div class="pair-row">
+      <div style="background:var(--pri-light)"><div style="font-weight:700;color:var(--pri)">${p.a}</div><div style="font-size:13px;margin-top:6px">${p.da}</div></div>
+      <div style="background:var(--pink-light)"><div style="font-weight:700;color:var(--pink)">${p.b}</div><div style="font-size:13px;margin-top:6px">${p.db}</div></div>
+    </div><div style="padding:10px;background:var(--red-light);border-radius:8px;font-size:13px"><strong>⚠️ Risk:</strong> ${p.risk}</div></div>`;
+  });
+  c.innerHTML=h;
+}
+function m6Timed(){
+  const c=document.getElementById('m6c');const pairs=sh(D.m6pairs);let idx=0,sc=0;
+  function go(){
+    if(idx>=pairs.length){c.innerHTML=`<div class="card" style="text-align:center;padding:40px"><div class="big-score">${sc}/${pairs.length}</div><p class="sub">Timed Challenge Complete!</p><button class="btn btn-p btn-s" onclick="m6Timed()">Try Again</button></div>`;return}
+    const p=pairs[idx];const showA=Math.random()>.5;
+    const drug=showA?p.a:p.b;const right=showA?p.da:p.db;const wrong=showA?p.db:p.da;
+    const opts=sh([{t:right,ok:true},{t:wrong,ok:false}]);
+    let tl=12;
+    c.innerHTML=`<div class="card fade-in"><div class="timer-bar"><span id="tt">${tl}s</span><div class="timer-track"><div class="timer-fill" id="tf" style="width:100%"></div></div></div>
+      <h3>What is ${drug}?</h3><p class="sub">Quick — identify the correct use!</p><div class="opts" id="tmo"></div></div>`;
+    const oel=document.getElementById('tmo');
+    opts.forEach(o=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=o.t;
+      b.onclick=()=>{clearInterval(tmr);
+        if(o.ok){sc++;sndOk();addPts(10,'m6');track('m6',true);toast('✓ Fast!')}
+        else{sndNo();track('m6',false);toast('✗ Wrong!','e')}
+        idx++;setTimeout(go,600)};
+      oel.appendChild(b);
+    });
+    const tmr=setInterval(()=>{tl--;const te=document.getElementById('tt'),fe=document.getElementById('tf');
+      if(te)te.textContent=tl+'s';if(fe)fe.style.width=(tl/12*100)+'%';
+      if(tl<=0){clearInterval(tmr);track('m6',false);idx++;go()}},1000);
+  }
+  go();
+}
+function m6Quiz(){runQuiz(document.getElementById('m6c'),D.m6q,'m6',el=>{el.innerHTML=doneMsgHTML('m6')})}
+
+// ═══ M7: Routes ═══
+function rM7(el){
+  el.innerHTML=hdr('🛤️','Routes of Administration (K20)','Match drugs to routes. Clinical scenario quizzes. 8 questions.','var(--green)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m7Match()">🎮 Route Matching</button>
+    <button class="btn btn-o btn-s" onclick="m7Quiz()">📝 Quiz (8 Q)</button>
+  </div></div><div id="m7c"></div>`;
+}
+function m7Match(){
+  const c=document.getElementById('m7c');const items=sh(D.m7match).slice(0,6);
+  c.innerHTML=`<div class="card fade-in"><h3>Match Drug → Route</h3><p class="sub">Drag each drug to its administration route.</p>
+    <div class="chip-pool" id="m7p"></div><div class="drop-zones" id="m7z"></div>
+    <div id="m7f"></div><button class="btn btn-p btn-s" style="margin-top:12px" onclick="m7Match()">🔄 New Set</button></div>`;
+  const pool=document.getElementById('m7p');
+  sh(items).forEach(it=>{
+    const ch=document.createElement('div');ch.className='chip';ch.style.cssText='background:var(--green-light);color:#065f46';
+    ch.textContent=it.d;ch.draggable=true;ch.id='r7_'+it.d.replace(/[^a-zA-Z]/g,'');
+    ch.ondragstart=e=>{e.dataTransfer.setData('text',JSON.stringify(it));ch.style.opacity='.4'};
+    ch.ondragend=()=>ch.style.opacity='1';
+    pool.appendChild(ch);
+  });
+  const routes=[...new Set(items.map(i=>i.r))];
+  document.getElementById('m7z').innerHTML='';
+  sh(routes).forEach(route=>{
+    const z=document.createElement('div');z.className='dz';
+    z.innerHTML=`<div class="dz-t">${route}</div><div class="dz-items"></div>`;
+    z.ondragover=e=>{e.preventDefault();z.classList.add('over')};
+    z.ondragleave=()=>z.classList.remove('over');
+    z.ondrop=e=>{
+      e.preventDefault();z.classList.remove('over');
+      const it=JSON.parse(e.dataTransfer.getData('text'));
+      if(it.r===route){
+        z.querySelector('.dz-items').innerHTML+=`<span class="chip" style="background:var(--green-light);color:#065f46;cursor:default;font-size:11px">${it.d}</span>`;
+        const ch=document.getElementById('r7_'+it.d.replace(/[^a-zA-Z]/g,''));if(ch)ch.classList.add('used');
+        sndOk();addPts(5,'m7');track('m7',true);toast('✓ Correct!');
+      }else{sndNo();track('m7',false);toast(`✗ ${it.d} → ${it.r}`,'e')}
+    };
+    document.getElementById('m7z').appendChild(z);
+  });
+}
+function m7Quiz(){runQuiz(document.getElementById('m7c'),D.m7q,'m7',el=>{el.innerHTML=doneMsgHTML('m7')})}
+
+// ═══ M8: Pharmacokinetics ═══
+function rM8(el){
+  el.innerHTML=hdr('🔬','Pharmacokinetics — ADME (K21)','Learn each stage, then answer 8 embedded questions.','var(--pri)');
+  el.innerHTML+=`<div class="card"><div class="act-btns">
+    <button class="btn btn-p btn-s" onclick="m8Learn()">📖 Learn ADME</button>
+    <button class="btn btn-o btn-s" onclick="m8Quiz()">📝 Quiz (8 Q)</button>
+  </div></div><div id="m8c"></div>`;
+}
+function m8Learn(){
+  const c=document.getElementById('m8c');
+  const stages=[
+    {s:'Absorption',ic:'📥',d:'Movement of drug from administration site into bloodstream. Affected by route, food, pH, blood flow. IV = 100% (no barrier). Oral = must pass GI tract.'},
+    {s:'Distribution',ic:'🚚',d:'Drug travels from bloodstream to body tissues. Affected by blood flow, protein binding, barriers (blood-brain). Highly perfused organs receive drug first.'},
+    {s:'Metabolism',ic:'🔄',d:'Biotransformation primarily in the LIVER via cytochrome P450. Converts active drugs to inactive metabolites. First-pass effect reduces oral drug bioavailability.'},
+    {s:'Excretion',ic:'📤',d:'Elimination from the body. Primary organ: KIDNEYS (urine). Also: lungs, GI tract, skin, breast milk. Impaired kidneys → drug accumulation → toxicity.'},
+  ];
+  c.innerHTML='<div class="click-grid" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr))">'+stages.map(s=>
+    `<div class="cc" onclick="this.classList.toggle('open')"><div class="ic">${s.ic}</div><div class="tt">${s.s}</div>
+    <div style="font-size:12px;color:var(--text3)">Tap to learn</div><div class="det">${s.d}</div></div>`).join('')+'</div>';
+}
+function m8Quiz(){runQuiz(document.getElementById('m8c'),D.m8q,'m8',el=>{el.innerHTML=doneMsgHTML('m8')})}
+
+// ═══ M9: Rights ═══
+function rM9(el){
+  el.innerHTML=hdr('✅','Rights of Medication Administration (K22)','Patient safety simulation. Can you catch every error? 8 questions.','var(--green)');
+  const rights=['Right Patient','Right Drug','Right Dose','Right Route','Right Time','Right Documentation','Right Reason','Right to Refuse','Right Education','Right Response'];
+  el.innerHTML+=`<div class="card"><h3>The 10 Rights</h3><div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">${rights.map(r=>`<span class="badge badge-g">${r}</span>`).join('')}</div></div><div id="m9c"></div>`;
+  runQuiz(document.getElementById('m9c'),D.m9q,'m9',el=>{el.innerHTML=doneMsgHTML('m9')});
+}
+
+// ═══ M10: Storage ═══
+function rM10(el){
+  el.innerHTML=hdr('🗄️','Storage & Disposal (K23)','Decision-based scenarios about proper medication storage. 7 questions.','var(--orange)');
+  el.innerHTML+=`<div id="m10c"></div>`;
+  runQuiz(document.getElementById('m10c'),D.m10q,'m10',el=>{el.innerHTML=doneMsgHTML('m10')});
+}
+
+// ═══ M11: Drug Info ═══
+function rM11(el){
+  el.innerHTML=hdr('📚','Drug Information Sources & FDA (K24)','Where do you look? Label interpretation. FDA knowledge. 8 questions.','var(--purple)');
+  el.innerHTML+=`<div id="m11c"></div>`;
+  runQuiz(document.getElementById('m11c'),D.m11q,'m11',el=>{el.innerHTML=doneMsgHTML('m11')});
+}
+
+// ═══ SIMULATION ═══
+function rSim(el){
+  el.innerHTML=hdr('🏥','Clinical Simulation','Full SOAP patient scenarios. Think like a real CMA. 3 cases.','var(--pink)');
+  el.innerHTML+=`<div id="simc"></div>`;
+  const cases=D.simCases;let ci=0;
+  function showCase(){
+    if(ci>=cases.length){document.getElementById('simc').innerHTML=`<div class="card" style="text-align:center;padding:40px"><div class="big-score">🎓</div><p>All simulations complete! Ready for real clinical scenarios.</p><button class="btn btn-p" onclick="sw('sim')">Restart</button> <button class="btn btn-o" onclick="sw('perf')">📊 Stats</button></div>`;return}
+    const cs=cases[ci];let si=0;
+    function showStep(){
+      if(si>=cs.steps.length){ci++;document.getElementById('simc').innerHTML=`<div class="card fade-in" style="text-align:center"><h3>✅ Case Complete: ${cs.pt}</h3><p class="sub">Excellent clinical reasoning!</p><button class="btn btn-p btn-s" id="snxc">Next Case →</button></div>`;
+        document.getElementById('snxc').onclick=showCase;return}
+      const st=cs.steps[si];
+      const sc=document.getElementById('simc');
+      sc.innerHTML=`<div class="sim-soap fade-in"><h4>📋 ${cs.pt}</h4>
+        <p><strong>Chief Complaint:</strong> ${cs.cc}</p><p><strong>Vitals:</strong> ${cs.vit}</p>
+        <p><strong>History:</strong> ${cs.hx}</p><p><strong>Assessment:</strong> ${cs.ax}</p></div>
+        <div class="card fade-in">
+          <div style="font-family:var(--font-display);font-weight:700;font-size:13px;color:var(--purple);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Step ${si+1} of ${cs.steps.length}</div>
+          <div class="progress-wrap"><div class="progress-fill" style="width:${si/cs.steps.length*100}%"></div></div>
+          <h3 style="font-size:16px">${st.q}</h3>
+          <div class="opts" id="simo"></div><div id="simf"></div>
+          <div style="margin-top:12px;display:none" id="simn"><button class="btn btn-p btn-s" id="simnb">Next Step →</button></div>
+        </div>`;
+      const oel=document.getElementById('simo');
+      const oi=sh(st.o.map((_,i)=>i));const ci2=oi.indexOf(st.c);
+      oi.forEach((orig,i)=>{
+        const b=document.createElement('button');b.className='opt';b.textContent=st.o[orig];
+        b.onclick=()=>{
+          oel.querySelectorAll('.opt').forEach((x,xi)=>{x.classList.add('done');if(xi===ci2)x.classList.add('correct');if(xi===i&&i!==ci2)x.classList.add('wrong')});
+          const ok=i===ci2;
+          if(ok){sndOk();addPts(15,'sim');toast('✓ Correct clinical decision!')}else{sndNo();toast('✗ Review the rationale','e')}
+          track('sim',ok);
+          document.getElementById('simf').innerHTML=`<div class="rat ${ok?'rat-g':'rat-r'}">${st.rat}</div>`;
+          document.getElementById('simn').style.display='block';
+        };
+        oel.appendChild(b);
+      });
+      document.getElementById('simnb').onclick=()=>{si++;showStep()};
+    }
+    showStep();
+  }
+  showCase();
+}
+
+// ═══ PERFORMANCE ═══
+function renderPerf(){
+  const el=document.getElementById('perf');
+  const ta=Object.values(A.att).reduce((a,b)=>a+b,0);
+  const tc=Object.values(A.cor).reduce((a,b)=>a+b,0);
+  const pct=ta?Math.round(tc/ta*100):0;
+  let rows='',strengths=[],weaks=[];
+  Object.keys(MN).forEach(id=>{
+    const at=A.att[id]||0,co=A.cor[id]||0,p=at?Math.round(co/at*100):0;
+    if(at>=3){if(p>=80)strengths.push(MN[id]);else if(p<60)weaks.push(MN[id])}
+    rows+=`<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f0f0f0">
+      <span style="font-size:20px">${MI[id]}</span>
+      <div style="flex:1"><div style="font-weight:600;font-size:14px">${MN[id]}</div>
+      <div class="progress-wrap"><div class="progress-fill" style="width:${p}%"></div></div></div>
+      <div style="font-family:var(--font-mono);font-weight:700;font-size:14px;color:${p>=80?'var(--green)':p>=60?'var(--orange)':'var(--red)'}">${at?p+'%':'—'}</div>
+      <div style="font-size:12px;color:var(--text3)">${co}/${at}</div></div>`;
+  });
+  el.innerHTML=`${hdr('📊','Performance Dashboard','Track progress, find strengths, target weak areas.','var(--pri)')}
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:13px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:700">Overall Accuracy</div>
+      <div class="big-score">${pct}%</div>
+      <p style="color:var(--text2)">${ta} questions · ${tc} correct · Best streak: ${A.best}</p>
+      <div style="font-family:var(--font-mono);font-size:24px;font-weight:700;color:var(--pri);margin-top:8px">Score: ${A.score}</div>
+    </div>
+    ${strengths.length?`<div class="card"><h3 style="color:var(--green)">💪 Your Strengths</h3><div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">${strengths.map(s=>`<span class="badge badge-g">${s}</span>`).join('')}</div></div>`:''}
+    ${weaks.length?`<div class="card"><h3 style="color:var(--red)">🎯 Focus Areas</h3><div style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0">${weaks.map(s=>`<span class="badge badge-r">${s}</span>`).join('')}</div><p class="sub">These modules need more practice. Keep going!</p></div>`:''}
+    <div class="card"><h3>Module Breakdown</h3><div style="margin-top:12px">${rows}</div></div>
+    ${ta===0?'<div class="card"><p style="text-align:center;color:var(--text3)">Start any module to see your stats here!</p></div>':''}`;
+}
+
+// ═══ HOME ═══
+function renderHome(){
+  const el=document.getElementById('home');
+  el.innerHTML=`<div class="welcome-hero"><h1>Master <span class="g">Pharmacology</span><br>for the NHA CCMA</h1>
+    <p>Interactive simulations, clinical scenarios, and adaptive quizzes — build real understanding, not just memorization.</p>
+    <button class="btn btn-p" onclick="sw('m1')">Start Learning →</button></div>
+    <div class="module-grid" id="hg"></div>`;
+  const g=document.getElementById('hg');
+  Object.keys(MN).forEach(id=>{
+    const at=A.att[id]||0,co=A.cor[id]||0,p=at?Math.round(co/at*100):0;
+    g.innerHTML+=`<div class="mc" onclick="sw('${id}')"><div class="mci">${MI[id]}</div><div class="mct">${MN[id]}</div>
+      <div class="mcd">${at?p+'% · '+at+' attempts':'Not started'}</div>
+      ${at?`<div class="progress-wrap"><div class="progress-fill" style="width:${p}%"></div></div>`:''}</div>`;
+  });
+}
+renderHome();
+upNav();
+</script>
+</body>
+</html>
